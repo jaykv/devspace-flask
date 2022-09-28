@@ -1,0 +1,6 @@
+Dockerfile
+Dockerfile.dev
+.env
+
+# Ignore .git folder
+.git

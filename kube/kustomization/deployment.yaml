@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+  labels:
+    app: app1
+spec:
+  selector:
+    matchLabels:
+      app: app1
+  template:
+    metadata:
+      labels:
+        app: app1
+    spec:
+      containers:
+      - name: app1
+        image: my-app
+        ports:
+        - containerPort: 8080
+        # option 1: use envFrom to inject configMap directly into env vars
+        envFrom:
+          - configMapRef:
+              name: configmap-1
+      
+      # option 2: use volumeMounts to transfer configMap files to mountPath
+      #   volumeMounts:
+      #   - name: config
+      #     mountPath: /config
+      # volumes:
+      # - name: config
+      #   configMap:
+      #     name: configmap-1

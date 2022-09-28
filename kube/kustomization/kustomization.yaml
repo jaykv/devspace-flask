@@ -1,0 +1,13 @@
+resources:
+- deployment.yaml
+configMapGenerator:
+  ## option 1: sets data as the key: value pairs from file contents for the enviroment vars
+  ##  usecase: use with envFrom in deployment.yaml
+  - envs:
+      - application.properties
+    name: configmap-1
+
+  ## option 2: sets data as the mapping of the file name to its corresponding contents
+  ##  usecase: use alongside volumeMount in deployment.yaml
+  # files:
+  # - application.properties
