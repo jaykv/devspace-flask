@@ -1,5 +1,5 @@
 # devspace-flask
-Example project to develop and deploy flask microservices on k8s using devspace.
+Starter project to develop and deploy flask microservices on k8s using devspace.
 
 Pre-reqs: 
 1. kubernetes cluster (kind/minikube/k3s etc.)
@@ -20,6 +20,7 @@ Pre-reqs:
 
 
 ## TODO
-* Build a k8s service to expose app without port forwarding
-* Create multiple microservices
-* Templatize devspace.yaml
+[x] Build a k8s service to expose app without port forwarding
+[x] Setup database service
+[ ] Create frontend app
+[ ] Templatize devspace.yaml

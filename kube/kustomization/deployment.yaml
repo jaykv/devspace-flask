@@ -31,3 +31,5 @@ spec:
       # - name: config
       #   configMap:
       #     name: configmap-1
+      - name: database
+        image: docker.io/jaydockship/database

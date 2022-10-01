@@ -1,0 +1,1 @@
+# from https://github.com/loft-sh/devspace-example-python/tree/main/02-fastapi-tortoise/database

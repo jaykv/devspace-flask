@@ -1,5 +1,8 @@
 resources:
 - deployment.yaml
+- service.yaml
+- ingress.yaml
+
 configMapGenerator:
   ## option 1: sets data as the key: value pairs from file contents for the enviroment vars
   ##  usecase: use with envFrom in deployment.yaml

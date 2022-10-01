@@ -3,6 +3,7 @@ name: devspace-flask
 
 # load vars from .env
 vars:
+  DATABASE_IMAGE: "database"
   DEVSPACE_ENV_FILE: ".env"
 
 # This is a list of `pipelines` that DevSpace can execute (you can define your own)
@@ -25,44 +26,52 @@ pipelines:
 images:
   app1:
     image: my-app
-    dockerfile: ./Dockerfile
+    context: ./backend
+    dockerfile: ./backend/Dockerfile
+    rebuildStrategy: ignoreContextChanges
+
+  database:
+    image: jaydockship/database
+    context: ./database
+    dockerfile: ./database/Dockerfile
 
 # This is a list of `deployments` that DevSpace can create for this project
 deployments:
-  app1:
+  my-deployment:
     # This deployment uses `kubectl` but you can also define `helm` deployments
     kubectl:
       manifests:
         - ./kube/kustomization
       kustomize: true
+
 # This is a list of `dev` containers that are based on the containers created by your deployments
 dev:
   app1:
     # Search for the container that runs this image
     imageSelector: my-app
-    # Replace the container image with this dev-optimized image (allows to skip image building during development)
-    devImage: ${DOCKER_REPO}/base-app-dev:0.0.1
-    workingDir: /src
-    command: ["python", "main.py"]
-    logs: {}
-    # Sync files between the local filesystem and the development container
-    sync:
-      - path: ./:/src
-        onUpload:
-          restartContainer: true
-        uploadExcludeFile: .dockerignore
-    # Open a terminal and use the following command to start it
-    #terminal:
-    #  command: ./devspace_start.sh
-    # Inject a lightweight SSH server into the container (so your IDE can connect to the remote dev env)
-    ssh:
-      enabled: true
-    # Make the following commands from my local machine available inside the dev container
-    proxyCommands:
-      - command: devspace
-      - command: kubectl
-      - command: helm
-      - command: git
+    containers:
+      app1:
+        # Replace the container image with this dev-optimized image (allows to skip image building during development)
+        devImage: ${DOCKER_REPO}/base-app-dev:0.0.1
+        workingDir: /src
+        command: ["python", "main.py"]    
+        sync:
+        - path: ./backend:/src
+          onUpload:
+            restartContainer: true
+        logs: {}
+        # Open a terminal and use the following command to start it
+        # terminal:
+        #   command: ./devspace_start.sh
+        # Inject a lightweight SSH server into the container (so your IDE can connect to the remote dev env)
+        ssh:
+          enabled: true
+        # Make the following commands from my local machine available inside the dev container
+        proxyCommands:
+          - command: devspace
+          - command: kubectl
+          - command: helm
+          - command: git
     # Forward the following ports to be able access your application via localhost
     ports:
       - port: "8080"
@@ -73,14 +82,10 @@ dev:
 # Use the `commands` section to define repeatable dev workflows for this project 
 commands:
   # build base dev docker image
-  bdi:
+  bdi-app:
     command: |-
-      docker build -t ${DOCKER_REPO}/base-app-dev:0.0.1 -f ./Dockerfile.dev .
+      docker build -t ${DOCKER_REPO}/base-app-dev:0.0.1 -f ./backend/Dockerfile.dev ./backend
 
-# Define dependencies to other projects with a devspace.yaml
-# dependencies:
-#   api:
-#     git: https://...  # Git-based dependencies
-#     tag: v1.0.0
-#   ui:
-#     path: ./ui        # Path-based dependencies (for monorepos)
+  bdi-db:
+    command: |-
+      docker build -t ${DOCKER_REPO}/database -f ./database/Dockerfile ./database
