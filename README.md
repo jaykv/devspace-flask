@@ -15,12 +15,13 @@ Pre-reqs:
 
 
 ## Deployment
-1. `devspace deploy` to deploy app to k8s
-2. `kubectl port-forward deployment/app1 8080:8080` to expose app
+1. `devspace deploy`
+2. `devspace open`
 
 
 ## TODO
-[x] Build a k8s service to expose app without port forwarding
-[x] Setup database service
-[ ] Create frontend app
-[ ] Templatize devspace.yaml
+- [x] Build a k8s service to expose app without port forwarding
+- [x] Setup database service
+- [ ] Build more flask services
+- [ ] Create frontend app
+- [ ] Templatize devspace.yaml

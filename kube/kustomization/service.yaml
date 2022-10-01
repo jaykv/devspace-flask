@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-nginx
+  name: my-service
   labels:
-    run: my-nginx
+    run: my-service
 spec:
   ports:
   - port: 8080
     protocol: TCP
   selector:
-    run: my-nginx 
+    app: app1 
