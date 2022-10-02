@@ -12,10 +12,12 @@ spec:
     metadata:
       labels:
         app: app1
+        type: application
     spec:
       containers:
       - name: app1
         image: my-app
+        resources: {}
         ports:
         - containerPort: 8080
         # option 1: use envFrom to inject configMap directly into env vars
@@ -31,5 +33,16 @@ spec:
       # - name: config
       #   configMap:
       #     name: configmap-1
-      - name: database
-        image: docker.io/jaydockship/database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1-service
+  labels:
+    run: app1-service
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+  selector:
+    app: app1

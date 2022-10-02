@@ -1,4 +1,5 @@
 from flask import Flask
+from sqlmodel import SQLModel, create_engine
 import os
 
 app = Flask(__name__)

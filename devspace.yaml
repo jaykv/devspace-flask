@@ -13,7 +13,7 @@ pipelines:
     run: |-
       run_dependencies --all       # 1. Deploy any projects this project needs (see "dependencies")
       create_deployments --all     # 2. Deploy Helm charts and manifests specfied as "deployments"
-      start_dev app1               # 3. Start dev mode "app" (see "dev" section)
+      start_dev app1 app2          # 3. Start dev mode "app" (see "dev" section)
   # You can run this pipeline via `devspace deploy` (or `devspace run-pipeline deploy`)
   deploy:
     run: |-
@@ -28,7 +28,11 @@ images:
     image: my-app
     context: ./backend
     dockerfile: ./backend/Dockerfile
-    rebuildStrategy: ignoreContextChanges
+
+  app2:
+    image: my-app2
+    context: ./backend
+    dockerfile: ./backend/Dockerfile
 
   database:
     image: jaydockship/database
@@ -48,15 +52,16 @@ deployments:
 dev:
   app1:
     # Search for the container that runs this image
-    imageSelector: my-app
+    labelSelector:
+      app: app1
     containers:
       app1:
         # Replace the container image with this dev-optimized image (allows to skip image building during development)
-        devImage: ${DOCKER_REPO}/base-app-dev:0.0.1
+        devImage: ${DOCKER_REPO}/base-app-dev:0.0.2
         workingDir: /src
         command: ["python", "main.py"]    
         sync:
-        - path: ./backend:/src
+        - path: ./backend/app1:/src
           onUpload:
             restartContainer: true
         logs: {}
@@ -79,12 +84,37 @@ dev:
     open:
       - url: http://localhost:8080
 
+  app2:
+    labelSelector:
+      app: app2
+    containers:
+      app2:
+        devImage: ${DOCKER_REPO}/base-app-dev:0.0.2
+        workingDir: /src
+        command: ["python", "main.py"]    
+        sync:
+        - path: ./backend/app2:/src
+          onUpload:
+            restartContainer: true
+        logs: {}
+        ssh:
+          enabled: true
+        proxyCommands:
+          - command: devspace
+          - command: kubectl
+          - command: helm
+          - command: git
+    ports:
+      - port: "8000"
+    open:
+      - url: http://localhost:8000
+
 # Use the `commands` section to define repeatable dev workflows for this project 
 commands:
   # build base dev docker image
   bdi-app:
     command: |-
-      docker build -t ${DOCKER_REPO}/base-app-dev:0.0.1 -f ./backend/Dockerfile.dev ./backend
+      docker build -t ${DOCKER_REPO}/base-app-dev:0.0.2 -f ./backend/Dockerfile.dev ./backend
 
   bdi-db:
     command: |-
