@@ -11,28 +11,28 @@ pipelines:
   # This is the pipeline for the main command: `devspace dev` (or `devspace run-pipeline dev`)
   dev:
     run: |-
-      run_dependencies --all       # 1. Deploy any projects this project needs (see "dependencies")
-      create_deployments --all     # 2. Deploy Helm charts and manifests specfied as "deployments"
-      start_dev app1 app2          # 3. Start dev mode "app" (see "dev" section)
+      run_dependencies --all
+      create_deployments --all
+      start_dev --all    
   # You can run this pipeline via `devspace deploy` (or `devspace run-pipeline deploy`)
   deploy:
     run: |-
-      run_dependencies --all                            # 1. Deploy any projects this project needs (see "dependencies")
-      build_images --all -t $(git describe --always)    # 2. Build, tag (git commit hash) and push all images (see "images")
-      create_deployments --all                          # 3. Deploy Helm charts and manifests specfied as "deployments"
+      run_dependencies --all
+      build_images --all -t $(git describe --always)
+      create_deployments --all
 
 # This is a list of `images` that DevSpace can build for this project
 # We recommend to skip image building during development (devspace dev) as much as possible
 images:
   app1:
     image: my-app
-    context: ./backend
-    dockerfile: ./backend/Dockerfile
+    context: ./backend/app1/
+    dockerfile: ./backend/app1/Dockerfile
 
   app2:
     image: my-app2
-    context: ./backend
-    dockerfile: ./backend/Dockerfile
+    context: ./backend/app2/
+    dockerfile: ./backend/app2/Dockerfile
 
   database:
     image: jaydockship/database
@@ -108,6 +108,31 @@ dev:
       - port: "8000"
     open:
       - url: http://localhost:8000
+
+  frontend:
+    labelSelector: 
+      app: spa-frontend
+    restartHelper:
+      inject: true
+    devImage: ${DOCKER_REPO}/spa-dev:1.0.0
+    command: ["npm", "run", "start"]
+    logs: {}
+    sync:
+      - path: ./frontend/spa:/app/
+        disableDownload: true
+        startContainer: true
+        excludePaths:
+          - node_modules/
+          - build/
+          - .npm/
+        onUpload:
+          exec:
+            - command: |-
+                npm ci --cache .npm --prefer-offline
+
+                ## Important- only restart the container, not the main process
+                /tmp/devspacehelper restart
+              onChange: ["./package.json"]
 
 # Use the `commands` section to define repeatable dev workflows for this project 
 commands:

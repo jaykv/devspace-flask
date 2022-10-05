@@ -16,12 +16,14 @@ Pre-reqs:
 
 ## Deployment
 1. `devspace deploy`
-2. `devspace open`
+2. `minikube tunnel`
+3. Open http://localhost
 
 
 ## TODO
 - [x] Build a k8s service to expose app without port forwarding
 - [x] Setup database service
-- [ ] Build more flask services
-- [ ] Create frontend app
+- [X] Build more flask services
+- [x] Add starter frontend app
+- [x] Setup nginx
 - [ ] Templatize devspace.yaml

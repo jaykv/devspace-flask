@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: spa-frontend
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spa-frontend
+  template:
+    metadata:
+      labels:
+        app: spa-frontend
+        type: application
+    spec:
+      containers:
+        - name: spa
+          image: docker.io/jaydockship/spa:1.0.0
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 80
+          resources: {}

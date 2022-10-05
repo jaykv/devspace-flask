@@ -3,6 +3,8 @@ resources:
 - app2.yaml
 - database.yaml
 - ingress.yaml
+- frontend.yaml
+- nginx.yaml
 
 configMapGenerator:
   ## option 1: sets data as the key: value pairs from file contents for the enviroment vars
