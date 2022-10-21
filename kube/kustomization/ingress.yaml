@@ -22,5 +22,12 @@ spec:
               number: 8080
         path: /app2
         pathType: Prefix
+      - backend:
+          service:
+            name: frontend-service
+            port:
+              number: 4200
+        path: /
+        pathType: Prefix
 status:
   loadBalancer: {}

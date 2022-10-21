@@ -20,5 +20,18 @@ spec:
           image: docker.io/jaydockship/spa:1.0.0
           imagePullPolicy: Always
           ports:
-          - containerPort: 80
+          - containerPort: 4200
           resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  labels:
+    run: frontend-service
+spec:
+  ports:
+  - port: 4200
+    protocol: TCP
+  selector:
+    app: spa-frontend
